@@ -16,8 +16,6 @@ class ViewController: UIViewController {
     @IBOutlet weak var history: UILabel!
     
     var userIsInTheMiddleOfTypingANumber = false
-    
-//  var operandStack = Array<Double>()
     var brain = CalculatorBrain()
     var displayValue :Double? {
         get{
@@ -26,12 +24,13 @@ class ViewController: UIViewController {
         set{
             if newValue != nil {
                 display.text = "\(newValue!)"
-            } else
-            {
-                display.text = "0"
+            } else {
+                let result = brain.evaluateAndReportErrors()
+                display.text = "\(result!)"
             }
-            
             userIsInTheMiddleOfTypingANumber = false
+//            history.text = brain.description != "" ? "= " + brain.description : ""
+            history.text = "= \(brain)"
         }
     }
     
@@ -74,7 +73,7 @@ class ViewController: UIViewController {
             }
         } else {
             brain.undo()
-            history.text = brain.description
+            displayValue = 0
         }
     }
     
@@ -90,35 +89,54 @@ class ViewController: UIViewController {
             
         } else {
             operate(sender)
-            history.text = brain.description
         }
     }
 
     
     @IBAction func enter() {
         userIsInTheMiddleOfTypingANumber = false
-
-//        operandStack.append(displayValue)
-//        println("OperandStack: \(operandStack)")
         if let result = brain.pushOperand(displayValue!){
             displayValue = result
         } else {
-            // making displayValue an optional
-            // put an error message in the display - extra credit
             displayValue = 0
         }
-        history.text = brain.description
+    }
+    
+    
+    @IBAction func pushVariable(sender: UIButton) {
+        if userIsInTheMiddleOfTypingANumber {
+            enter()
+        }
+        if let result = brain.pushOperand(sender.currentTitle!) {
+            displayValue = result
+        } else {
+            displayValue = nil
+        }
+    }
+    
+    
+    @IBAction func StoreVariable(sender: UIButton) {
+        
+        if let variable = last(sender.currentTitle!) {
+            if displayValue != nil {
+                brain.variableValues["\(variable)"] = displayValue
+                if let result = brain.evaluate() {
+                    displayValue = result
+                } else {
+                    displayValue = nil
+                }
+            }
+        }
+        userIsInTheMiddleOfTypingANumber = false
     }
     
     
     @IBAction func clear() {
-//       displayValue = 0
         display.text = "0"
-//        operandStack.removeAll(keepCapacity: false)
         brain.performClear()
-        
+        brain.variableValues.removeAll(keepCapacity: false)
         userIsInTheMiddleOfTypingANumber = false
-        history.text = brain.description
+        history.text = " "
     }
     
     @IBAction func operate(sender: UIButton) {
@@ -129,13 +147,7 @@ class ViewController: UIViewController {
         
         let operation = sender.currentTitle!
         brain.performOperation(operation)
-        
-        if let result = brain.evaluate(){
-            displayValue = result
-        } else {
-            displayValue = 0
-        }
-        history.text = brain.description
+        displayValue = brain.evaluate()
     }
 } //end
 
