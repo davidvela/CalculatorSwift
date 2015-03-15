@@ -140,7 +140,7 @@ class ViewController: UIViewController {
 } //end
 
 
-//CODE IN THE MODEL
+//CODE IN THE MODEL 
 // print the stack
 //        switch operation{
 //        case "×" : performOperation { $0 * $1 }

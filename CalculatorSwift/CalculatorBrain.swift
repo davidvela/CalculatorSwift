@@ -65,9 +65,9 @@ class CalculatorBrain{
     
     var description: String {
         get{
-            let(result, remainder) = evaluateAndReportErrors(opStack)
-            return result!
-//            return ("\(opStack)")
+//            let(result, remainder) = evaluateAndReportErrors(opStack)
+//            return result!
+            return ("\(opStack)")
         }
         
     }
